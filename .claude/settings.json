@@ -1,32 +1,12 @@
 {
   "hooks": {
-    "PostToolUse": [
+    "PreToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'File modified' >> hook-test.log"
-          }
-        ]
-      },
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/validate-rule.sh\"",
-            "if": "Write(rules/**)"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/validate-rule.sh\"",
-            "if": "Edit(rules/**)"
+            "command": "./scripts/check-sensitive.sh"
           }
         ]
       }
