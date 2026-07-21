@@ -3,8 +3,9 @@
 
 INPUT=$(cat)
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+NORMALIZED_PATH="${FILE_PATH//\\//}"
 
-case "$FILE_PATH" in
+case "$NORMALIZED_PATH" in
   rules/*.yml|rules/*.yaml|*/rules/*.yml|*/rules/*.yaml) ;;
   *) exit 0 ;;
 esac
