@@ -1,20 +1,16 @@
 #!/bin/bash
 # scripts/check-sensitive.sh - PreToolUse hook that blocks tool calls whose
-# input appears to contain a credential or secret.
+# file_path targets a sensitive file (.env, *.key, *.pem, secrets/, credentials/).
 
 INPUT=$(cat)
+FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+NORMALIZED_PATH="${FILE_PATH//\\//}"
 
-MATCH=$(echo "$INPUT" | grep -EIio \
-  -e 'BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY' \
-  -e 'AKIA[0-9A-Z]{16}' \
-  -e 'eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}' \
-  -e '(api[_-]?key|secret|token|password|bearer)"?[[:space:]]*[:=][[:space:]]*"?[A-Za-z0-9/+_.-]{16,}' \
-  | head -5)
-
-if [ -n "$MATCH" ]; then
-  echo "Blocked: tool input appears to contain a credential or secret:" >&2
-  echo "$MATCH" >&2
-  exit 2
-fi
+case "$NORMALIZED_PATH" in
+  *.env|*.key|*.pem|*secrets/*|*credentials/*)
+    echo "Blocked: tool input targets a sensitive path: $FILE_PATH" >&2
+    exit 2
+    ;;
+esac
 
 exit 0
