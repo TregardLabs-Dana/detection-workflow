@@ -1,5 +1,15 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/check-prereqs.sh"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": ".*",
@@ -11,12 +21,13 @@
         ]
       }
     ],
-    "SessionStart": [
+    "PostToolUse": [
       {
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "./scripts/check-prereqs.sh"
+            "command": "./scripts/validate-rule.sh"
           }
         ]
       }
@@ -26,10 +37,26 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -NoProfile -NonInteractive -Command 'Add-Type -AssemblyName System.Windows.Forms; $n = New-Object System.Windows.Forms.NotifyIcon; $n.Icon = [System.Drawing.SystemIcons]::Information; $n.Visible = $true; $n.ShowBalloonTip(3000, \"Claude Code\", \"Task complete!\", \"Info\"); Start-Sleep -Seconds 4; $n.Dispose()'"
+            "command": "./scripts/notify-complete.sh"
           }
         ]
       }
     ]
+  },
+  "permissions": {
+    "deniedPaths": [
+      ".env*",
+      "*.key",
+      "*.pem",
+      "secrets/"
+    ],
+    "allowedCommands": [
+      "npm test",
+      "python -m pytest"
+    ]
+  },
+  "costThreshold": {
+    "warningAt": 5.00,
+    "hardLimit": 20.00
   }
 }
